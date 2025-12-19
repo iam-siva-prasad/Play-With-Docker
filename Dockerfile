@@ -1,5 +1,3 @@
-# Test web app that returns the name of the host/pod/container servicing req
-# Linux x64
 FROM node:current-alpine
 
 LABEL org.opencontainers.image.title="Hello Docker Learners!" \
@@ -15,8 +13,11 @@ COPY . /usr/src/app
 # Set working directory context
 WORKDIR /usr/src/app
 
-# Install dependencies from packages.json
+# Install dependencies from package.json
 RUN npm install
 
+# Expose port 3000
+EXPOSE 3000
+
 # Command for container to execute
-ENTRYPOINT [ "node", "app.js" ]
+CMD [ "node", "app.js" ]
