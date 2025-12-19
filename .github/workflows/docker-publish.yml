@@ -39,7 +39,7 @@ jobs:
         run: |
           docker run -d -p 8080:3000 pwd:latest
           sleep 5
-          curl http://localhost:8080 | grep "IAM-SIVA-PRASAD"
+          curl http://localhost:8080 | grep "Have a blast learning Docker!"
   Push:
     runs-on: ubuntu-latest
     needs: test
