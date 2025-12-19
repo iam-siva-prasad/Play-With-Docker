@@ -15,8 +15,8 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t PWD:latest .
-          docker save PWD:latest > image.tar
+          docker build -t pwd:latest .
+          docker save pwd:latest > image.tar
       - name: Upload image artifact
         uses: actions/upload-artifact@v4
         with:
@@ -37,7 +37,7 @@ jobs:
 
       - name: Test Docker image
         run: |
-          docker run -d -p 8080:3000 PWD:latest
+          docker run -d -p 8080:3000 pwd:latest
           sleep 5
           curl http://localhost:8080 | grep "IAM-SIVA-PRASAD"
   Push:
@@ -63,5 +63,5 @@ jobs:
 
       - name: Tag and Push Docker image
         run: |
-          docker tag PWD:latest golisivaprasad/PWD:latest
-          docker push golisivaprasad/PWD:latest
+          docker tag pwd:latest golisivaprasad/pwd:latest
+          docker push golisivaprasad/pwd:latest
