@@ -1,23 +1,21 @@
-FROM node:current-alpine
 
-LABEL org.opencontainers.image.title="Hello Docker Learners!" \
-      org.opencontainers.image.description="Web server showing host that responded" \
-      org.opencontainers.image.authors="@IamSivaPrasad"
+FROM node:20-alpine
 
-# Create directory in container image for app code
-RUN mkdir -p /usr/src/app
-
-# Copy app code (.) to /usr/src/app in container image
-COPY . /usr/src/app
-
-# Set working directory context
+ENV NODE_ENV=production
 WORKDIR /usr/src/app
 
-# Install dependencies from package.json
-RUN npm install
+# Copy only package manifests first for better caching
+COPY package*.json ./
+RUN if [ -f package-lock.json ]; then npm ci --omit=dev; else npm install --omit=dev; fi
 
-# Expose port 3000
+# Copy app source
+COPY . .
+
+# Optional, if you know the port
 EXPOSE 3000
 
-# Command for container to execute
-CMD [ "node", "app.js" ]
+# Security: non-root user
+RUN addgroup -S app && adduser -S app -G app
+USERUSER app
+
+# Start app (CMD is flexible)
