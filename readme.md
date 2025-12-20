@@ -55,10 +55,11 @@ Push: Tags and pushes image to Docker Hub.
 
 
 
-#Technologies Used
+**Technologies Used**
 
 Docker (Multi-Stage Builds)
 GitHub Actions (CI/CD Automation)
 Docker Hub (Image Registry)
+
 
 
