@@ -31,11 +31,11 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t docker:sp .
+          docker build -t docker:siva .
 
       - name: Save Docker image as artifact
         run: |
-          docker save docker:sp > image.tar
+          docker save docker:siva > image.tar
 
       - name: Upload image artifact
         uses: actions/upload-artifact@v4
@@ -61,11 +61,11 @@ jobs:
           CONTAINER_NAME: docker-ci-test
         run: |
           set -e
-          docker run -d --name "$CONTAINER_NAME" -p 8080:3000 docker:sp
+          docker run -d --name "$CONTAINER_NAME" -p 8080:3000 docker:siva
 
           # Wait for port to be ready (basic retry loop)
           for i in {1..10}; do
-            if curl -sSf http://sphost:8080/ > /dev/null; then
+            if curl -sSf http://localhost:8080/ > /dev/null; then
               echo "App responded OK"
               break
             fi
@@ -74,7 +74,7 @@ jobs:
           done
 
           # Final assertion (fail the job if not 200 or 204)
-          curl -sSf -o /dev/null -w "%{http_code}\n" http://sphost:8080/ | grep -qE "200|204"
+          curl -sSf -o /dev/null -w "%{http_code}\n" http://localhost:8080/ | grep -qE "200|204"
 
           # Cleanup
           docker logs "$CONTAINER_NAME" || true
@@ -103,12 +103,12 @@ jobs:
 
       - name: Tag and Push Docker image
         env:
-          IMAGE_NAME: golisivaprasad/sp
+          IMAGE_NAME: golisivaprasad/local
         run: |
           set -e
-          # Tag both sp and the commit SHA for traceability
-          docker tag docker:sp $IMAGE_NAME:sp
-          # docker tag docker:sp $IMAGE_NAME:${{ github.sha }}
+          # Tag both siva and the commit SHA for traceability
+          docker tag docker:siva $IMAGE_NAME:siva
+          # docker tag docker:siva $IMAGE_NAME:${{ github.sha }}
 
-          docker push $IMAGE_NAME:sp
+          docker push $IMAGE_NAME:siva
           # docker push $IMAGE_NAME:${{ github.sha }}
