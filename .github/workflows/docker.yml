@@ -103,7 +103,7 @@ jobs:
 
       - name: Tag and Push Docker image
         env:
-          IMAGE_NAME: golisivaprasad/docker1
+          IMAGE_NAME: golisivaprasad/docker
         run: |
           set -e
           # Tag both latest and the commit SHA for traceability
