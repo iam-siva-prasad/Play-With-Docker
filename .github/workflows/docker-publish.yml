@@ -1,0 +1,102 @@
+
+name: Multi-Stage Docker Pipeline
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      # Optional: Enable Buildx for better caching/multi-arch (kept single-arch build below)
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build Docker image
+        run: |
+          docker build -t pwd:latest .
+
+      - name: Save Docker image as artifact
+        run: |
+          docker save pwd:latest > image.tar
+
+      - name: Upload image artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: docker-image
+          path: image.tar
+          retention-days: 1
+
+  test:
+    runs-on: ubuntu-latest
+    needs: build
+    steps:
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker image
+        run: docker load < image.tar
+
+      - name: Run and Test Docker image
+        env:
+          CONTAINER_NAME: pwd-ci-test
+        run: |
+          set -e
+          docker run -d --name "$CONTAINER_NAME" -p 8080:3000 pwd:latest
+
+          # Wait for port to be ready (basic retry loop)
+          for i in {1..10}; do
+            if curl -sSf http://localhost:8080/ > /dev/null; then
+              echo "App responded OK"
+              break
+            fi
+            echo "Waiting for app to be ready..."
+            sleep 3
+          done
+
+          # Final assertion (fail the job if not 200)
+          curl -sSf -o /dev/null -w "%{http_code}\n" http://localhost:8080/ | grep -qE "200|204"
+
+          # Cleanup
+          docker logs "$CONTAINER_NAME" || true
+          docker rm -f "$CONTAINER_NAME"
+
+  push:
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Download image artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: docker-image
+
+      - name: Load Docker image
+        run: docker load < image.tar
+
+      - name: Tag and Push Docker image
+        env:
+          IMAGE_NAME: golisivaprasad/pwd
+        run: |
+          set -e
+          # Tag both latest and the commit SHA for traceability
+          docker tag pwd:latest $IMAGE_NAME:latest
+          docker tag pwd:latest $IMAGE_NAME:${{ github.sha }}
+
+          docker push $IMAGE_NAME:latest
+          docker push $IMAGE_NAME
