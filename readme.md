@@ -1,28 +1,28 @@
-#Docker Multi-Stage Pipeline
+**Docker Multi-Stage Pipeline**
 Overview
 This project leverages Docker Multi-Stage builds and GitHub Actions to automate the daily build and deployment of our website code. The pipeline runs scheduled tasks every day during non-business hours, ensuring the application remains up-to-date without impacting production operations. The latest Docker image is pushed to Docker Hub for easy distribution and deployment.
 
-#Key Features
+**Key Features**
 
 
-Automated Daily Builds
+**Automated Daily Builds**
 Uses GitHub Actions to build the application image every day.
 
 
-#Multi-Stage Docker Builds
+**Multi-Stage Docker Builds**
 Optimizes image size and enhances security by separating build and runtime stages.
 
 
-#Push to Docker Hub
+**Push to Docker Hub**
 Publishes the latest image to Docker Hub for seamless deployment.
 
 
-#Scheduled Execution During Off-Hours
+**Scheduled Execution During Off-Hours**
 Runs outside business hours to minimize downtime and avoid service disruption.
 
 
 
-#Business Impact
+**Business Impact**
 By implementing this pipeline, we:
 
 Reduce the risk of downtime for web services.
@@ -33,14 +33,14 @@ Ensure updates happen seamlessly outside of peak business hours.
 
 Workflow Highlights
 
-#Trigger Types:
+**Trigger Types:**
 
 Daily schedule at 11:00 AM IST (05:30 UTC).
 On every push to the main branch.
 Manual trigger via workflow_dispatch.
 
 
-#Stages:
+**Stages:**
 
 Build: Creates Docker image using multi-stage build.
 Test: Runs container and validates application health.
@@ -54,3 +54,4 @@ Push: Tags and pushes image to Docker Hub.
 Docker (Multi-Stage Builds)
 GitHub Actions (CI/CD Automation)
 Docker Hub (Image Registry)
+
