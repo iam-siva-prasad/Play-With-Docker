@@ -4,6 +4,7 @@ var app = express();
 var os = require("os");
 var morgan  = require('morgan');
 
+
 app.engine('handlebars', exphbs({defaultLayout: 'main'}));
 app.set('view engine', 'handlebars');
 app.use(express.static('static'));
